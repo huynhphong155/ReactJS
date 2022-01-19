@@ -69,3 +69,8 @@
   color: white;
   background: linear-gradient(270deg, #ff5400 0%, #f17f21 80.56%);
 }
+
+.button_inactive {
+  background: #c9c4c0;
+  transition: all ease 0.3s;
+}

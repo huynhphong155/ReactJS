@@ -1,17 +1,34 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import style from "./Login.module.css";
 import userIcon from "../../assets/user.svg";
 import passwordIcon from "../../assets/password.svg";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../Firebase";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState({});
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: any) => {
+  onAuthStateChanged(auth, (currentUser: any) => {
+    setUser(currentUser);
+  });
+
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    console.log(username);
-    console.log(password);
+
+    try {
+      setLoading(true);
+      const user = await signInWithEmailAndPassword(auth, username, password);
+      setLoading(false);
+      navigate("/login-success");
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,9 +75,18 @@ const Login = () => {
       </div>
 
       <div>
-        <button className={style.button} onClick={handleSubmit}>
-          Đăng nhập
-        </button>
+        {loading ? (
+          <button
+            className={`${style.button} ${style.button_inactive}`}
+            onClick={handleSubmit}
+          >
+            Đang đăng nhập
+          </button>
+        ) : (
+          <button className={style.button} onClick={handleSubmit}>
+            Đăng nhập
+          </button>
+        )}
       </div>
     </form>
   );
